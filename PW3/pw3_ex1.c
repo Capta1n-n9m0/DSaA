@@ -80,11 +80,12 @@ int main() {
             NULL
     };
     for(int i = 0; strings[i]; i++){
-        if(if_brackets_are_balanced(strings[i]))
+        printf("%s: ", strings[i]);
+        if(if_brackets_are_balanced(strings[i])) {
             puts("Balanced");
-        else
+        } else {
             puts("Unbalanced");
-
+        }
     }
     return 0;
 }
