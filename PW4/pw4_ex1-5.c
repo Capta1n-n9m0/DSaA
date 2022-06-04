@@ -37,13 +37,14 @@ void PrintNamedList(list_node *node, const char *name);
 void FrontBackSplit(list_node *source, list_node **half1, list_node **half2);
 list_node *SortedMerge(list_node *l1, list_node *l2);
 void MergeSort(list_node **head);
-void RemoveDuplicates(list_node **l);
+void RemoveDuplicates(list_node *l);
+void ReverseLinkedList(list_node **l);
 
 int main(){
     srand(time(NULL));
-    int step = 100;
+    int step = 10;
     list my_list = init_list();
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 5; i++){
         int item = rand()%step;
         add_to_end(&my_list, item);
     }
@@ -56,8 +57,10 @@ int main(){
     PrintNamedList(l_copy, "l_copy");
     MergeSort(&l_copy);
     PrintNamedList(l_copy, "sorted");
-    RemoveDuplicates(&l_copy);
+    RemoveDuplicates(l_copy);
     PrintNamedList(l_copy, "reduced");
+    ReverseLinkedList(&l_copy);
+    PrintNamedList(l_copy, "reversed");
 }
 
 // My approach to the problem
@@ -251,18 +254,30 @@ void MergeSort(list_node **l){
 
     *l = SortedMerge(h1, h2);
 }
-void RemoveDuplicates(list_node **l){
-    list_node *c1 = *l, *c2, *dup;
-    while (c1 != NULL && c1->next != NULL){
-        c2 = c1;
-        while (c2->next != NULL){
-            if(c1->data == c2->next->data){
-                dup = c2->next;
-                c2->next = c2->next->next;
-                free(dup);
-            } else c2 = c2->next;
-            c1 = c1->next;
+void RemoveDuplicates(list_node *l){
+    list_node *current, *next, *dup;
+    current = l;
+    next = current->next;
+    while (next){
+        if(current->data == next->data){
+            dup = next;
+            current->next = next->next;
+            next = current->next;
+            free(dup);
+        }else{
+            current = next;
+            next = current->next;
         }
     }
 }
 
+void ReverseLinkedList(list_node **l){
+    list_node *current = *l, *prev = NULL, *next = NULL;
+    while (current != NULL){
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    *l = prev;
+}
