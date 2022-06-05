@@ -1,5 +1,5 @@
 /* Author: Abbas Aliyev
- * Copy-pasted from binary_tree.c, kindly provided by our professor Samir Guliyev
+ * With great aid of our professor Samir Guliyev
  * */
 
 #include <stdio.h>

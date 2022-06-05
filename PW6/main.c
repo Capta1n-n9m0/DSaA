@@ -5,7 +5,7 @@
 const int table_size = 11;
 
 int hash(int i, int k) {
-    return i % k;
+    return (2*i + 5) % k;
 }
 
 struct node_ {
@@ -70,20 +70,20 @@ void remove_node(node **n) {
     free(cur);
 }
 
-struct hash_table_ {
+struct hashtable_chaining_ {
     int size;
     node **data;
 };
-typedef struct hash_table_ hash_table;
+typedef struct hashtable_chaining_ hashtable_chaining;
 
-hash_table init_table(int size) {
-    hash_table res = {0};
+hashtable_chaining init_hashtable_chaining(int size) {
+    hashtable_chaining res = {0};
     res.size = size;
     res.data = calloc(size, sizeof(node *));
     return res;
 }
 
-void print_hash_table(hash_table t) {
+void print_hashtable_chaining(hashtable_chaining t) {
     puts("===================");
     for (int i = 0; i < t.size; i++) {
         printf("%-3d: ", i);
@@ -93,28 +93,99 @@ void print_hash_table(hash_table t) {
     puts("===================");
 }
 
-void insert_table(hash_table *table, int data) {
+void insert_table_chaining(hashtable_chaining *table, int data) {
     int id = hash(data, table->size);
     add_to_end(&table->data[id], data);
 }
-node *search_table(hash_table table, int data){
+node *search_table_chaining(hashtable_chaining table, int data){
     int id = hash(data, table.size);
     return search_list(table.data[id], data);
 }
-void remove_from_table(hash_table *table, int data){
+void remove_from_table_chaining(hashtable_chaining *table, int data){
     int id = hash(data, table->size);
     node *temp = search_list(table->data[id], data);
     remove_node(&temp);
 }
 
-int main() {
-    hash_table t1 = init_table(table_size);
-    for (int i = 0; i < 77; i++) {
-        insert_table(&t1, rand() % 100);
+struct hashtable_probing_{
+    int size;
+    int **data;
+};
+typedef struct hashtable_probing_ hashtable_probing;
+
+hashtable_probing init_hashtable_probing(int size){
+    hashtable_probing res = {0};
+    res.size = size;
+    res.data = calloc(size, sizeof (int *));
+    return res;
+}
+
+void print_hashtable_probing(hashtable_probing t){
+    puts("===================");
+    for(int i = 0; i < t.size; i++){
+        printf("%-3d: ", i);
+        if(t.data[i]) printf("%d\n", *(t.data[i]));
+        else printf("NULL\n");
     }
-    print_hash_table(t1);
-    remove_from_table(&t1, 97);
-    print_hash_table(t1);
+    puts("===================");
+}
+
+void insert_hashtable_probing(hashtable_probing *t, int data){
+    int id = hash(data, t->size);
+    while (id < t->size){
+        if(t->data[id] == NULL){
+            t->data[id] = calloc(1, sizeof (int));
+            *t->data[id] = data;
+            break;
+        }
+        id++;
+    }
+}
+
+int *search_hashtable_probing(hashtable_probing t, int data){
+    int id = hash(data, t.size);
+    while (id < t.size){
+        if(*t.data[id] == data) return t.data[id];
+        id++;
+    }
+    return NULL;
+}
+
+void remove_from_hashtable_probing(hashtable_probing *t, int data){
+    int id = hash(data, t->size);
+    while (id < t->size){
+        if(*t->data[id] == data){
+            free(t->data[id]);
+            t->data[id] = NULL;
+            break;
+        }
+        id++;
+    }
+}
+
+int hash2(int i, int prime){
+    return (prime - i)%prime;
+}
+
+int main() {
+    // no seed for predictable results
+    // srand(time(NULL));
+    puts("Chaining");
+    hashtable_chaining t1 = init_hashtable_chaining(table_size);
+    for (int i = 0; i < 77; i++) {
+        insert_table_chaining(&t1, rand() % 100);
+    }
+    print_hashtable_chaining(t1);
+    remove_from_table_chaining(&t1, 97);
+    print_hashtable_chaining(t1);
+
+    puts("\nProbing");
+    hashtable_probing t2 = init_hashtable_probing(11);
+    print_hashtable_probing(t2);
+    insert_hashtable_probing(&t2, 5);
+    insert_hashtable_probing(&t2, 5);
+    insert_hashtable_probing(&t2, 5);
+    print_hashtable_probing(t2);
 
 }
 
