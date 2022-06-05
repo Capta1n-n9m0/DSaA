@@ -167,6 +167,49 @@ int hash2(int i, int prime){
     return (prime - i)%prime;
 }
 
+const int PRIME = 7;
+
+void insert_hashtable_double_hashing(hashtable_probing *t, int data){
+    int id = hash(data, t->size), offset = hash2(data, PRIME);
+    while (id < t->size){
+        if(t->data[id] == NULL ){
+            t->data[id] = calloc(1, sizeof(int));
+            *t->data[id] = data;
+            break;
+        }
+        id = (id + offset) % t->size;
+    }
+}
+
+int *search_hashtable_double_hashing(hashtable_probing t, int data){
+    int id = hash(data, t.size), offset = hash2(data, PRIME);
+    int first = id;
+    do{
+        if(*t.data[id] == data)
+            return t.data[id];
+        id = (id + offset) % t.size;
+    } while (id != first);
+    return NULL;
+}
+
+void remove_from_hashtable_double_hashing(hashtable_probing *t, int data){
+    int id = hash(data, t->size), offset = hash2(data, PRIME);
+    int first = id;
+    do{
+        if(*t->data[id] == data){
+            //if next one matches, move to the next one
+            if(*t->data[(id + offset) % t->size] == data) {
+                id = (id + offset) % t->size;
+                continue;
+            }
+            free(t->data[id]);
+            t->data[id] = NULL;
+        }
+        id = (id + offset) % t->size;
+    } while (first != id);
+}
+
+
 int main() {
     // no seed for predictable results
     // srand(time(NULL));
